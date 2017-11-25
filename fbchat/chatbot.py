@@ -18,10 +18,11 @@ class EchoBot(Client):
         self.markAsRead(author_id)
 
         if self.state == 0 and author_id != self.uid:
+            self.thread_id = thread_id
             self.send(Message(text = "Hello, welcome to deepdoc. What is your name?"), thread_id=thread_id, thread_type=thread_type)
             self.state +=1
 
-        elif self.state == 1 and author_id != self.uid:
+        elif self.state == 1 and author_id != self.uid and self.thread_id==thread_id:
             log.info("{} from {} in {}".format(message_object, thread_id, thread_type.name))
             self.send(Message(text ="Your name is " + message_object.text +". My name is chatbot.\nWhat's the matter?"), thread_id=thread_id, thread_type=thread_type)
             self.name = message_object.text
@@ -29,7 +30,7 @@ class EchoBot(Client):
             log.info("name of person= " + self.name)
             self.state +=1
 
-        elif self.state == 2 and author_id != self.uid:
+        elif self.state == 2 and author_id != self.uid and self.thread_id==thread_id:
             matter = message_object.text
             log.info("matter of person= " + matter)
 
@@ -55,7 +56,7 @@ class EchoBot(Client):
                 jsonFile = json.dumps(dic)
                 log.info(jsonFile)
 
-        elif self.state == 3 and author_id != self.uid:
+        elif self.state == 3 and author_id != self.uid and self.thread_id==thread_id:
             try:
                 scale = int(message_object.text)
                 log.info(scale)
@@ -68,7 +69,8 @@ class EchoBot(Client):
 
             except ValueError:
                 self.send(Message(text = "This is not a number. Try again."), thread_id=thread_id, thread_type=thread_type)
-
+        elif author_id != self.uid or author_id != self.clientId:
+            self.send(Message(text = "The doctor is busy and talking to someone else. Try again in 5 minuites."), thread_id=thread_id, thread_type=thread_type)
 
 
 
