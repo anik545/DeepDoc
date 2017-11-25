@@ -1,14 +1,39 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dashboard</title>
+
+    <link rel="stylesheet" href = "{{ url_for('static', filename = 'styles/a.css') }}"></style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></style>
 </head>
 
 
 <body>
-    
+    <svg width="960" height="500" class="chart"></svg>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    <script src="{{ url_for('static', filename='scripts/vis.js') }}"></script>
+
+    <table class="table">
+        <thead>
+            <th>Question</th>
+            <th>Answer</th>
+        </thead>
+        <tbody>
+            {% for l in chats %} {% for a in l.keys() %}
+            <tr>
+                <td>{{ a }}</td>
+                <td>{{ l[a] }}</td>
+            </tr>
+            {% endfor %} 
+            {% endfor %}
+        </tbody>
+    </table>
+
 </body>
+
 </html>

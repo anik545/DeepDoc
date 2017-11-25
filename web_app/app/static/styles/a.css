@@ -1,0 +1,13 @@
+.chart rect {
+    fill: steelblue;
+  }
+  
+  .chart text {
+    fill: black;
+    font: 10px sans-serif;
+    text-anchor: end;
+  }
+
+#graphs,#table {
+  margin:10px
+}
