@@ -51,9 +51,11 @@ $('#go').on('click', function(){
         console.log(chat_data[0])
         for (var i=0; i<chat_data.length; i++){
             console.log(chat_data[i])
+            html+='<tr>'
             for (var key in chat_data[i]){
-                html+='<tr><td>'+key+'</td><td>'+chat_data[i][key]+'</td></tr>'
+                html+='<td>'+chat_data[i][key]+'</td>'
             }
+            html+='</tr>'
         }
         html+='</tbody></table>'
         $('#questions').append(html)

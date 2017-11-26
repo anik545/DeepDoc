@@ -13,7 +13,7 @@ class EchoBot(Client):
                 self.jsonFile = json.load(d)
                 print(self.jsonFile)
         except:
-            print('no',os.path.join(os.pardir, "webapp","data.json"))
+            print('no',os.path.join(os.pardir, "web_app","data.json"))
             self.jsonFile = {} # {author_id:{name:name,pains:[{q:a},{q:a}]}}
         self.states = {}
 
@@ -106,7 +106,7 @@ class EchoBot(Client):
                 word = l
                 isFound = True
                 log.info(word)
-                self.jsonFile[author_id]["pains"].append({word:0,"time":0})
+                self.jsonFile[author_id]["pains"].append({"pain":word,"scale":0,"time":0})
                 self.send(Message(text ="Your pain point is the " + word +". On a scale of 1 to 10, what is the severity of the problem?"), thread_id=thread_id, thread_type=thread_type)
                 self.states[author_id] = 3
         if not isFound:
@@ -122,9 +122,9 @@ class EchoBot(Client):
             scale = int(message_object.text)
             log.info(scale)
             if scale <0 or scale >10:
-                self.send(Message(text = "This is not a valid number. Try again."), thread_id=thread_id, thread_type=thread_type)
+                self.send(Message(text = "How long have you had this problem for?"), thread_id=thread_id, thread_type=thread_type)
             else:
-                self.jsonFile[author_id]["pains"][-1] = {x:scale for x in self.jsonFile[author_id]["pains"][-1]}
+                self.jsonFile[author_id]["pains"][-1]["scale"] = scale
                 self.send(Message(text = "Any other pains? Type no to finish"), thread_id=thread_id, thread_type=thread_type)
                 self.states[author_id] = 4
         except ValueError:
@@ -133,7 +133,7 @@ class EchoBot(Client):
     def HandleReplyTime(self, message_object, thread_id, thread_type, author_id):
         painTime = message_object.text
         self.jsonFile[author_id]["pains"][-1]["time"] = painTime
-        self.states{author_id} = 2
+        self.states[author_id] = 2
         self.send(Message(text = "Any other pains? Type no to finish"), thread_id=thread_id, thread_type=thread_type)
 
     def save_json(self):
