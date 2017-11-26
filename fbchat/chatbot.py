@@ -96,13 +96,10 @@ class EchoBot(Client):
             self.save_json()
             return None
         log.info("matter of person= " + matter)
-
         #see if matter is in keywords
-        word=''
-        mat_word = matter.split(' ')
         isFound=False
         for l in self.list_:
-            if l in mat_word:
+            if l in matter.lower():
                 word = l
                 isFound = True
                 log.info(word)
@@ -124,8 +121,8 @@ class EchoBot(Client):
             if scale <0 or scale >10:
                 self.send(Message(text = "How long have you had this problem for?"), thread_id=thread_id, thread_type=thread_type)
             else:
-                self.jsonFile[author_id]["pains"][-1]["scale"] = scale
-                self.send(Message(text = "Any other pains? Type no to finish"), thread_id=thread_id, thread_type=thread_type)
+                self.jsonFile[author_id]["pains"][-1] = {x:scale for x in self.jsonFile[author_id]["pains"][-1]}
+                self.send(Message(text = "How long have you had this pain for?"), thread_id=thread_id, thread_type=thread_type)
                 self.states[author_id] = 4
         except ValueError:
             self.send(Message(text = "This is not a number. Try again."), thread_id=thread_id, thread_type=thread_type)
