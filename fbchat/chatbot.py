@@ -96,13 +96,10 @@ class EchoBot(Client):
             self.save_json()
             return None
         log.info("matter of person= " + matter)
-
         #see if matter is in keywords
-        word=''
-        mat_word = matter.split(' ')
         isFound=False
         for l in self.list_:
-            if l in mat_word:
+            if l in matter.lower():
                 word = l
                 isFound = True
                 log.info(word)
