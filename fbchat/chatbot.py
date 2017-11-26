@@ -125,7 +125,7 @@ class EchoBot(Client):
                 self.send(Message(text = "This is not a valid number. Try again."), thread_id=thread_id, thread_type=thread_type)
             else:
                 self.jsonFile[author_id]["pains"][-1] = {x:scale for x in self.jsonFile[author_id]["pains"][-1]}
-                self.send(Message(text = "Any other pains? Type no to finish"), thread_id=thread_id, thread_type=thread_type)
+                self.send(Message(text = "How long have you had this pain for?"), thread_id=thread_id, thread_type=thread_type)
                 self.states[author_id] = 4
         except ValueError:
             self.send(Message(text = "This is not a number. Try again."), thread_id=thread_id, thread_type=thread_type)
@@ -133,7 +133,7 @@ class EchoBot(Client):
     def HandleReplyTime(self, message_object, thread_id, thread_type, author_id):
         painTime = message_object.text
         self.jsonFile[author_id]["pains"][-1]["time"] = painTime
-        self.states{author_id} = 2
+        self.states[author_id] = 2
         self.send(Message(text = "Any other pains? Type no to finish"), thread_id=thread_id, thread_type=thread_type)
 
     def save_json(self):
