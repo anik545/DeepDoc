@@ -143,7 +143,7 @@ $('#go').on('click', function(){
         bar.append("rect")
             .attr("width", function(d){return x(d.time)})
             .attr("height", barHeight - 1)
-            .style("fill", function(d){var a=d.scale*10;return "hsl(+"+a+", 100%, 50%)"});
+            .style("fill", function(d){var a=d.scale*10;return "hsl(+"+(100-a)+", 100%, 50%)"});
 
         bar.append("text")
             .attr("x", function(d) {return -l; })

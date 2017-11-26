@@ -10,7 +10,7 @@ with open ("../NN/NN_test","r") as f:
         for x in lines:
             id = ''.join([str(random.randint(0,9)) for x in range(len(str(100001326800715)))])
             n = "".join([random.choice(string.ascii_lowercase) for y in range(5)])
-            j[id] = {"pains":{},"name":n,"model":x}
+            j[id] = {"pains":[],"name":n,"model":x}
     print(j)
     with open("data.json","w") as d_:
         json.dump(j,d_)

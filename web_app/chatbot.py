@@ -2,6 +2,7 @@ from fbchat import Client, log
 from fbchat.models import *
 import json
 import os
+import requests
 
 class EchoBot(Client):
     def __init__(self, username, password):
@@ -9,18 +10,16 @@ class EchoBot(Client):
         self.list_= ["chest", "head", "shoulders", "knee", "toe", "heart", "stomach", "eye", "back", "arm"]
         try:
             with open(os.path.join("web_app","data.json"), "r") as d:
-                print('yes')
                 self.jsonFile = json.load(d)
-                print(self.jsonFile)
         except:
             self.jsonFile = {} # {author_id:{name:name,pains:[{q:a},{q:a}]}}
         self.states = {}
 
 
-    def GetPhrases(sentence):
-        uri = 'westus.api.cognitive.microsoft.com'
+    def GetPhrases(self, sentence):
+        uri = 'http://westus.api.cognitive.microsoft.com'
         path = '/text/analytics/v2.0/keyPhrases'
-        accessKey = '----'
+        accessKey = '4f0892073601483d9e6dcb7ed3b34f95'
 
 
         documents = {'documents':[
@@ -28,11 +27,12 @@ class EchoBot(Client):
         ]}
 
         headers = {'Ocp-Apim-Subscription-Key': accessKey}
-        conn = httplib.HTTPSConnection(uri)
+        # conn = http.client.HTTPSConnection(uri)
         body = json.dumps(documents)
-        conn.request("POST", path, body, headers)
-        response = conn.getresponse()
-        return json.loads(response.read())["documents"]["keyPhrases"]
+        r = requests.post(uri+path, body, headers)
+        # conn.request("POST", path, body, headers)
+        print(json.loads(r.text))
+        return json.loads(r.text)["documents"]["keyPhrases"]
 
     def GetSentiment(sentence):
         uri = 'westus.api.cognitive.microsoft.com'
@@ -80,25 +80,24 @@ class EchoBot(Client):
 
 
     def HandleReplyName(self, message_object, thread_id, thread_type, author_id):
-        if author_id in jsonFile:
+        if author_id in self.jsonFile:
             self.send(Message(text ="Hi " + message_object.text +". My name is chatbot.\nWhat's the matter?"), thread_id=thread_id, thread_type=thread_type)
             name = message_object.text
             if self.jsonFile.get(author_id,None) is None:
                 self.jsonFile[author_id] = {"name":name,"pains":[]}
             self.states[author_id] = 2
         else:
-            self.send(Message(text ="Sorry, you're not registeres"), thread_id=thread_id, thread_type=thread_type)
+            self.send(Message(text ="Sorry, you're not registered"), thread_id=thread_id, thread_type=thread_type)
             self.states[author_id] = 0
 
     
     def HandleReplyMatter(self, message_object, thread_id, thread_type, author_id):
         matter = message_object.text
-        log.info(matter)
         if matter == "no":
             self.states[author_id] = 0
             self.save_json()
             return None
-        log.info("matter of person= " + matter)
+        # log.info("matter of person= " + matter)
         #see if matter is in keywords
         isFound=False
         for l in self.list_:
@@ -106,12 +105,13 @@ class EchoBot(Client):
                 word = l
                 isFound = True
                 log.info(word)
+                print({"pain":word,"scale":0,"time":0})
                 self.jsonFile[author_id]["pains"].append({"pain":word,"scale":0,"time":0})
                 self.send(Message(text ="Your pain point is the " + word +". On a scale of 1 to 10, what is the severity of the problem?"), thread_id=thread_id, thread_type=thread_type)
                 self.states[author_id] = 3
         if not isFound:
-            # if self.GetSentiment(matter) < 0.5:
-            #     word = self.GetPhrases(matter)[0]
+            #words = self.GetPhrases(matter)
+            log.info(words)
                 
             self.states[author_id] = 2
             self.send(Message(text = "Sorry we dont know about your pain point, What's the matter?"), thread_id=thread_id, thread_type=thread_type)
@@ -124,8 +124,8 @@ class EchoBot(Client):
             if scale <0 or scale >10:
                 self.send(Message(text = "How many days have you had this problem for?"), thread_id=thread_id, thread_type=thread_type)
             else:
-                self.jsonFile[author_id]["pains"][-1] = {x:scale for x in self.jsonFile[author_id]["pains"][-1]}
-                self.send(Message(text = "How long have you had this pain for?"), thread_id=thread_id, thread_type=thread_type)
+                self.jsonFile[author_id]["pains"][-1]["scale"] = scale
+                self.send(Message(text = "How many days have you had this problem for?"), thread_id=thread_id, thread_type=thread_type)
                 self.states[author_id] = 4
         except ValueError:
             self.send(Message(text = "This is not a number. Try again."), thread_id=thread_id, thread_type=thread_type)
@@ -141,10 +141,7 @@ class EchoBot(Client):
 
 
     def save_json(self):
-        print('a')
         with open(os.path.join("web_app","data.json"), "w") as d:
-            log.info(self.jsonFile)
-            log.info(d)
             json.dump(self.jsonFile, d)
 
     def welcome():
