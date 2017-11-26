@@ -26,6 +26,10 @@ def get_model_data():
     name = request.args.get("name")
     with open("data.json","r") as data:
         d = json.load(data)
+        for id in d:
+            if d[id]["name"] == name:
+            outs = d[id]["model"]
+
         outs = d[name]["model"]
         #outs = [0,0.1,0.1,0.1,0.05,0.05,0.3,0.15,0.15,0,0,0,0]
     return jsonify(out=outs)
@@ -37,6 +41,8 @@ def get_chat_data():
 
     with open("data.json","r") as data:
         d = json.load(data)
-        outs = d[name]["questions"]
+        for id in d:
+            if d[id]["name"] == name:
+            outs = d[id]["pains"]
     return jsonify(out=outs)
     

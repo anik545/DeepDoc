@@ -41,14 +41,13 @@ $('#go').on('click', function(){
         .attr("y", barHeight / 2)
         .attr("dy", ".35em")
         .text(function(d) { return d; });
-
     });
 
     $.getJSON("/_chat_data", {name:$('#name').val()}, function(data){
         console.log(data)
         chat_data = data.out;
         $("#questions").empty();
-        var html = '<h2>Pains</h2><table class="table"><thead><th>Question</th><th>Answer</th></thead><tbody>';
+        var html = '<h2>Problems</h2><table class="table"><thead><th>Problem</th><th>Severity</th></thead><tbody>';
         console.log(chat_data[0])
         for (var i=0; i<chat_data.length; i++){
             console.log(chat_data[i])
