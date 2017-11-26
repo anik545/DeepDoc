@@ -5,7 +5,7 @@ import json
 class EchoBot(Client):
     def __init__(self, username, password):
         super(EchoBot, self).__init__(username, password)
-        self.state =0
+        self.state = 0
         self.painlist = []
         self.list_= ["chest", "head", "shoulders", "knee", "toe", "heart",
             "stomach", "eye", "back", "arm"]
@@ -37,22 +37,20 @@ class EchoBot(Client):
             log.info("matter of person= " + matter)
 
             #see if matter is in keywords
-            #
-            word=''
-            mat_word = matter.split(' ')
             isFound=False
             for l in self.list_:
-                if l in mat_word:
+                if l in matter.lower():
                     word = l
                     isFound = True
                     self.pain = word
                     log.info(word)
-                    self.send(Message(text ="Your pain point is the " + word +". On a scale of 1 to 10, how much does it hurt?"), thread_id=thread_id, thread_type=thread_type)
+                    self.send(Message(text ="I think your pain point is the " + word +". On a scale of 1 to 10, how much does it hurt?"), thread_id=thread_id, thread_type=thread_type)
                     self.state += 1
                     self.list_.remove(word)
             if not isFound:
-                self.state = 5
-                self.send(Message(text = "Sorry we dont know about your pain point"), thread_id=thread_id, thread_type=thread_type)
+                #Place back to initial state
+                self.state = 0
+                self.send(Message(text = "Sorry, I couldn't recognize that as a pain point. Thank you for using DeepDoc!"), thread_id=thread_id, thread_type=thread_type)
                 # Make json file of what data was inputted by user
                 dic = {'name' : self.name, 'pains' : self.painlist}
                 jsonFile = json.dumps(dic)
@@ -74,13 +72,13 @@ class EchoBot(Client):
                     
         #If pain and scale were given, look for how long the pain has been happening (just natural language)
         elif self.state == 4 and author_id != self.uid and self.thread_id==thread_id:
-            painTime = int(message_object.text)
+            painTime = message_object.text
             log.info(painTime)
             self.painlist.append({'pain' : self.pain, 'scale' : self.scale, 'time' : painTime})
             self.state = 2
             self.send(Message(text = "What other pain are you experiencing?"), thread_id=thread_id, thread_type=thread_type)
             
-        elif author_id != self.uid or author_id != self.clientId:
+        elif author_id != self.uid:
             self.send(Message(text = "The doctor is busy and talking to someone else. Try again in 5 minuites."), thread_id=thread_id, thread_type=thread_type)
 
 
