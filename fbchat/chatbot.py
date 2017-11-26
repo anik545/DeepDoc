@@ -8,7 +8,7 @@ class EchoBot(Client):
         super(EchoBot, self).__init__(username, password)
         self.list_= ["chest", "head", "shoulders", "knee", "toe", "heart", "stomach", "eye", "back", "arm"]
         try:
-            with open(os.path.join(os.pardir, "web_app","data.json"), "r") as d:
+            with open(os.path.join("web_app","data.json"), "r") as d:
                 print('yes')
                 self.jsonFile = json.load(d)
                 print(self.jsonFile)
@@ -57,13 +57,14 @@ class EchoBot(Client):
         self.markAsRead(author_id)
         log.info(self.states)
         if self.states.get(author_id,0) == 0 and author_id != self.uid:
+            
             self.thread_id = thread_id
             self.send(Message(text = "Hello, welcome to deepdoc. What is your name?"), thread_id=thread_id, thread_type=thread_type)
             self.states[author_id] = 1
 
         elif self.states.get(author_id,0) == 1 and author_id != self.uid:
+
             self.HandleReplyName(message_object, thread_id, thread_type, author_id)
-            self.states[author_id] = 2
 
         elif self.states.get(author_id,0) == 2 and author_id != self.uid:
             self.HandleReplyMatter(message_object, thread_id, thread_type,author_id)
@@ -80,12 +81,15 @@ class EchoBot(Client):
 
 
     def HandleReplyName(self, message_object, thread_id, thread_type, author_id):
-
-        log.info("{} from {} in {}".format(message_object, thread_id, thread_type.name))
-        self.send(Message(text ="Hi " + message_object.text +". My name is chatbot.\nWhat's the matter?"), thread_id=thread_id, thread_type=thread_type)
-        name = message_object.text
-        if self.jsonFile.get(author_id,None) is None:
-            self.jsonFile[author_id] = {"name":name,"pains":[]}
+        if author_id in jsonFile:
+            self.send(Message(text ="Hi " + message_object.text +". My name is chatbot.\nWhat's the matter?"), thread_id=thread_id, thread_type=thread_type)
+            name = message_object.text
+            if self.jsonFile.get(author_id,None) is None:
+                self.jsonFile[author_id] = {"name":name,"pains":[]}
+            self.states[author_id] = 2
+        else:
+            self.send(Message(text ="Sorry, you're not registeres"), thread_id=thread_id, thread_type=thread_type)
+            self.states[author_id] = 0
 
     
     def HandleReplyMatter(self, message_object, thread_id, thread_type, author_id):
@@ -119,7 +123,7 @@ class EchoBot(Client):
             scale = int(message_object.text)
             log.info(scale)
             if scale <0 or scale >10:
-                self.send(Message(text = "How long have you had this problem for?"), thread_id=thread_id, thread_type=thread_type)
+                self.send(Message(text = "How many days have you had this problem for?"), thread_id=thread_id, thread_type=thread_type)
             else:
                 self.jsonFile[author_id]["pains"][-1] = {x:scale for x in self.jsonFile[author_id]["pains"][-1]}
                 self.send(Message(text = "How long have you had this pain for?"), thread_id=thread_id, thread_type=thread_type)
@@ -129,13 +133,17 @@ class EchoBot(Client):
 
     def HandleReplyTime(self, message_object, thread_id, thread_type, author_id):
         painTime = message_object.text
-        self.jsonFile[author_id]["pains"][-1]["time"] = painTime
-        self.states[author_id] = 2
-        self.send(Message(text = "Any other pains? Type no to finish"), thread_id=thread_id, thread_type=thread_type)
+        try:
+            self.jsonFile[author_id]["pains"][-1]["time"] = int(painTime)
+            self.states[author_id] = 2
+            self.send(Message(text = "Any other pains? Type no to finish"), thread_id=thread_id, thread_type=thread_type)
+        except:
+            self.send(Message(text = "This is not a number. Try again."), thread_id=thread_id, thread_type=thread_type)
+
 
     def save_json(self):
         print('a')
-        with open(os.path.join(os.pardir, "web_app","data.json"), "w") as d:
+        with open(os.path.join("web_app","data.json"), "w") as d:
             log.info(self.jsonFile)
             log.info(d)
             json.dump(self.jsonFile, d)

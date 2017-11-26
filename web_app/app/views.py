@@ -2,6 +2,7 @@ from flask import render_template, jsonify, request
 
 from app import app
 import json
+import os
 
 @app.route('/')
 def index():
@@ -24,13 +25,12 @@ def get_model_data():
 
     #test outputs
     name = request.args.get("name")
-    with open("data.json","r") as data:
+    with open(os.path.join("web_app","data.json"),"r") as data:
         d = json.load(data)
         for id in d:
-            if d[id]["name"] == name:
+            if d[id]["name"].lower() == name.lower():
                 outs = d[id]["model"]
 
-        outs = d[name]["model"]
         #outs = [0,0.1,0.1,0.1,0.05,0.05,0.3,0.15,0.15,0,0,0,0]
     return jsonify(out=outs)
 
@@ -38,11 +38,12 @@ def get_model_data():
 def get_chat_data():
     #get chat data from json
     name = request.args.get("name")
-
-    with open("data.json","r") as data:
+    outs = {}
+    with open(os.path.join("web_app","data.json"),"r") as data:
         d = json.load(data)
         for id in d:
-            if d[id]["name"] == name:
+            if d[id]["name"].lower() == name.lower():
                 outs = d[id]["pains"]
+    print(outs)
     return jsonify(out=outs)
     
