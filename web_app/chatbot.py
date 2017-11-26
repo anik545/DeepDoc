@@ -13,7 +13,6 @@ class EchoBot(Client):
                 self.jsonFile = json.load(d)
                 print(self.jsonFile)
         except:
-            print('no',os.path.join(os.pardir, "web_app","data.json"))
             self.jsonFile = {} # {author_id:{name:name,pains:[{q:a},{q:a}]}}
         self.states = {}
 
@@ -150,7 +149,6 @@ class EchoBot(Client):
 
     def welcome():
         pass
-
 
 
 
