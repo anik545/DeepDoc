@@ -3,7 +3,6 @@ from fbchat.models import *
 import json
 import os
 
-
 class EchoBot(Client):
     def __init__(self, username, password):
         super(EchoBot, self).__init__(username, password)
@@ -72,6 +71,10 @@ class EchoBot(Client):
         elif self.states.get(author_id,0) == 3 and author_id != self.uid:
             self.HandleReplyScale(message_object, thread_id, thread_type,author_id)
 
+        elif self.states.get(author_id,0) == 4 and author_id != self.uid:
+            self.HandleReplyTime(message_object, thread_id, thread_type,author_id)
+
+
         elif author_id != self.uid:
             self.send(Message(text = "The doctor is busy and talking to someone else. Try again in 5 minuites."), thread_id=thread_id, thread_type=thread_type)
 
@@ -103,7 +106,7 @@ class EchoBot(Client):
                 word = l
                 isFound = True
                 log.info(word)
-                self.jsonFile[author_id]["pains"].append({word:0})
+                self.jsonFile[author_id]["pains"].append({word:0,"time":0})
                 self.send(Message(text ="Your pain point is the " + word +". On a scale of 1 to 10, what is the severity of the problem?"), thread_id=thread_id, thread_type=thread_type)
                 self.states[author_id] = 3
         if not isFound:
@@ -123,9 +126,15 @@ class EchoBot(Client):
             else:
                 self.jsonFile[author_id]["pains"][-1] = {x:scale for x in self.jsonFile[author_id]["pains"][-1]}
                 self.send(Message(text = "Any other pains? Type no to finish"), thread_id=thread_id, thread_type=thread_type)
-                self.states[author_id] = 2
+                self.states[author_id] = 4
         except ValueError:
             self.send(Message(text = "This is not a number. Try again."), thread_id=thread_id, thread_type=thread_type)
+
+    def HandleReplyTime(self, message_object, thread_id, thread_type, author_id):
+        painTime = message_object.text
+        self.jsonFile[author_id]["pains"][-1]["time"] = painTime
+        self.states{author_id} = 2
+        self.send(Message(text = "Any other pains? Type no to finish"), thread_id=thread_id, thread_type=thread_type)
 
     def save_json(self):
         print('a')

@@ -28,7 +28,7 @@ def get_model_data():
         d = json.load(data)
         for id in d:
             if d[id]["name"] == name:
-            outs = d[id]["model"]
+                outs = d[id]["model"]
 
         outs = d[name]["model"]
         #outs = [0,0.1,0.1,0.1,0.05,0.05,0.3,0.15,0.15,0,0,0,0]
@@ -43,6 +43,6 @@ def get_chat_data():
         d = json.load(data)
         for id in d:
             if d[id]["name"] == name:
-            outs = d[id]["pains"]
+                outs = d[id]["pains"]
     return jsonify(out=outs)
     
